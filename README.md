@@ -4,7 +4,7 @@
 
 This project provides a simple image classification API using **FastAPI** and **PyTorch**, containerized with **Docker** and optionally deployed using **AWS App Runner**.
 
-🔗 **Live Demo:** [Access the deployed service](https://pspcyz4qxx.us-east-1.awsapprunner.com)
+**Live Demo:** [Access the deployed service](https://pspcyz4qxx.us-east-1.awsapprunner.com)
 
 ---
 
@@ -33,7 +33,7 @@ docker run -p 127.0.0.1:8080:8080 <image_id>
 
 ---
 
-## 🚦 Usage
+## Usage
 
 ### Option A: Run Locally
 Start the FastAPI app:
@@ -75,7 +75,7 @@ https://<your-app-runner-url>/docs
 
 ---
 
-## 📚 References
+## References
 
 - Adapted from the [official PyTorch REST API tutorial](https://pytorch.org/tutorials/intermediate/flask_rest_api_tutorial.html)
 
