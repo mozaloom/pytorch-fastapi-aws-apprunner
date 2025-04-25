@@ -12,8 +12,8 @@ This project provides a simple image classification API using **FastAPI** and **
 
 ### 1. Clone the Repository
 ```bash
-git clone <your-repo-url>
-cd <your-repo-directory>
+git clone https://github.com/mozaloom/pytorch-fastapi-aws-apprunner.git
+cd pytorch-fastapi-aws-apprunner
 ```
 
 ### 2. Build the Docker Image
