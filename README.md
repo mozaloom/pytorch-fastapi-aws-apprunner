@@ -66,7 +66,7 @@ python app.py
 ## Verify Swagger is Working
 Visit:
 ```
-http://localhost:8080/docs
+http://localhost:8080/docs 
 ```
 Or if deployed:
 ```
