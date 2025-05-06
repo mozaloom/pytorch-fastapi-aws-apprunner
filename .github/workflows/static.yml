@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read     # for actions/checkout
-  pages: write       # for deploy-pages
-  id-token: write    # for configure-pages
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: "pages"
@@ -21,31 +21,27 @@ jobs:
       name: deploy
       url: ${{ steps.deploy.outputs.page_url }}
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      # 1) Auto-enable Pages (first run only)
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
+      # (Optional) Ensure Pages site exists — see earlier suggestions if you're still hitting the 404 on configure-pages
+
+      - name: Package site
+        run: |
+          tar --dereference --hard-dereference --directory . -cf artifact.tar .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          token: ${{ secrets.PAT }}
-          enablement: github
+          name: github-pages      # <-- we’ll tell deploy-pages to look for this
+          path: artifact.tar
+          retention-days: 1
+          if-no-files-found: error
 
-      # 2) (Optional) build step, if you have a static-site generator
-      # - name: Build site
-      #   run: npm ci && npm run build
-
-      # 3) Upload your site directory (here, the repo root) for Pages
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v1
-        with:
-          path: .   # change to your built output folder, e.g. "./public"
-
-      # 4) Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         id: deploy
         uses: actions/deploy-pages@v2
         with:
-          token: ${{ secrets.PAT }}
+          token: ${{ secrets.PAT }}      # or GITHUB_TOKEN if your site is already enabled
+          artifact_name: github-pages     # <— this must match the “name:” above
