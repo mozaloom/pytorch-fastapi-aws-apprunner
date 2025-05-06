@@ -1,4 +1,6 @@
+[![CI](https://github.com/mozaloom/pytorch-fastapi-aws-apprunner/actions/workflows/cicd.yml/badge.svg)](https://github.com/mozaloom/pytorch-fastapi-aws-apprunner/actions/workflows/cicd.yml)
 
+[![CI/CD Pipeline](https://github.com/mozaloom/pytorch-fastapi-aws-apprunner/actions/workflows/main.yml/badge.svg)](https://github.com/mozaloom/pytorch-fastapi-aws-apprunner/actions/workflows/main.yml)
 
 # FastAPI + PyTorch Inference API
 
