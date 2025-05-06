@@ -8,8 +8,8 @@ on:
 
 permissions:
   contents: read
-  pages: write    # for deploy-pages
-  id-token: write # not strictly needed here but harmless
+  pages: write
+  id-token: write
 
 concurrency:
   group: "pages"
@@ -25,17 +25,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Ensure GitHub Pages site exists
-        # Uses your PAT to POST /repos/:owner/:repo/pages
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
-        run: |
-          curl -s -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: token $GITHUB_TOKEN" \
-            https://api.github.com/repos/${GITHUB_REPOSITORY}/pages \
-            -d '{"source":{"branch":"GPU","path":"/"}}' \
-          || echo "Site likely already exists"
+      # (Optional) Ensure Pages site exists — see earlier suggestions if you're still hitting the 404 on configure-pages
 
       - name: Package site
         run: |
@@ -44,7 +34,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: github-pages
+          name: github-pages      # <-- we’ll tell deploy-pages to look for this
           path: artifact.tar
           retention-days: 1
           if-no-files-found: error
@@ -53,4 +43,5 @@ jobs:
         id: deploy
         uses: actions/deploy-pages@v2
         with:
-          token: ${{ secrets.PAT }}
+          token: ${{ secrets.PAT }}      # or GITHUB_TOKEN if your site is already enabled
+          artifact_name: github-pages     # <— this must match the “name:” above
