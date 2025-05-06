@@ -1,47 +1,55 @@
-# .github/workflows/deploy.yml
 name: Deploy static content to Pages
-
 on:
   push:
     branches: ["GPU"]
   workflow_dispatch:
-
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
-
+  actions: write
 concurrency:
   group: "pages"
   cancel-in-progress: true
-
 jobs:
   deploy:
     environment:
-      name: deploy
-      url: ${{ steps.deploy.outputs.page_url }}
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-
-      # (Optional) Ensure Pages site exists — see earlier suggestions if you're still hitting the 404 on configure-pages
-
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+        with:
+          enablement: true
+        
       - name: Package site
         run: |
-          tar --dereference --hard-dereference --directory . -cf artifact.tar .
-
+          # List directory contents before tar
+          echo "Directory contents before tar:"
+          ls -la
+          
+          # Create the artifact using tar
+          tar --dereference --hard-dereference -cvf artifact.tar .
+          
+          # Verify the tar file was created
+          echo "Checking if artifact.tar was created:"
+          ls -la artifact.tar
+          
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: github-pages      # <-- we’ll tell deploy-pages to look for this
+          name: github-pages
           path: artifact.tar
           retention-days: 1
           if-no-files-found: error
-
+      
       - name: Deploy to GitHub Pages
-        id: deploy
+        id: deployment
         uses: actions/deploy-pages@v2
         with:
-          token: ${{ secrets.PAT }}      # or GITHUB_TOKEN if your site is already enabled
-          artifact_name: github-pages     # <— this must match the “name:” above
+          token: ${{ secrets.PAT }}
+          artifact_name: github-pages
