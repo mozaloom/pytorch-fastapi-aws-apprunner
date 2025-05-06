@@ -2,26 +2,20 @@
 name: Deploy static content to Pages
 
 on:
-  # Runs on pushes targeting the default branch
   push:
     branches: ["GPU"]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
-  pages: write
+  pages: write   # this applies to GITHUB_TOKEN only
   id-token: write
 
-# Allow one concurrent deployment
 concurrency:
   group: "pages"
   cancel-in-progress: true
 
 jobs:
-  # Single deploy job since we're just deploying
   deploy:
     environment:
       name: deploy
@@ -31,15 +25,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Pages
+      - name: Setup Pages (auto-enable)
         uses: actions/configure-pages@v4
         with:
-          # auto-enable GitHub Pages if not already enabled
           enablement: github
+          # switch to your PAT so we can enable Pages on a Pages-disabled repo
+          github-token: ${{ secrets.PAT }}
 
       - name: Package site
         run: |
-          # Create archive of site content
           tar --dereference --hard-dereference --directory . -cf artifact.tar .
 
       - name: Upload artifact
@@ -53,3 +47,6 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
+        with:
+          # now that Pages is enabled, this can use GITHUB_TOKEN
+          github-token: ${{ secrets.PAT }}
