@@ -32,11 +32,17 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v4
+      - name: Package site
+        run: |
+          # Create archive of site content
+          tar --dereference --hard-dereference --directory . -cf artifact.tar .
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          # Upload entire repository
-          path: '.'
+          name: github-pages
+          path: artifact.tar
+          retention-days: 1
+          if-no-files-found: error
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
