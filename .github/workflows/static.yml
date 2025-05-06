@@ -1,4 +1,4 @@
-# Simple workflow for deploying static content to GitHub Pages
+# .github/workflows/deploy.yml
 name: Deploy static content to Pages
 
 on:
@@ -30,12 +30,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
+        with:
+          # auto-enable GitHub Pages if not already enabled
+          enablement: github
+
       - name: Package site
         run: |
           # Create archive of site content
           tar --dereference --hard-dereference --directory . -cf artifact.tar .
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -43,6 +49,7 @@ jobs:
           path: artifact.tar
           retention-days: 1
           if-no-files-found: error
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
