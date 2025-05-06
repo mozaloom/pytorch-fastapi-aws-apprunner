@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: read     # read your code
+  pages: write       # publish to Pages
+  id-token: write    # required by configure-pages
 
 concurrency:
   group: "pages"
@@ -21,27 +21,34 @@ jobs:
       name: deploy
       url: ${{ steps.deploy.outputs.page_url }}
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # (Optional) Ensure Pages site exists — see earlier suggestions if you're still hitting the 404 on configure-pages
-
-      - name: Package site
-        run: |
-          tar --dereference --hard-dereference --directory . -cf artifact.tar .
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      # If this is a brand-new repo/site, ensure Pages is enabled:
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
         with:
-          name: github-pages      # <-- we’ll tell deploy-pages to look for this
-          path: artifact.tar
-          retention-days: 1
-          if-no-files-found: error
+          # use PAT only on first run if Pages is disabled; after that you can revert to GITHUB_TOKEN
+          token: ${{ secrets.PAT }}
+          enablement: github
 
+      # (Optional) build step, if your site uses a static-site generator
+      # - name: Build
+      #   run: npm ci && npm run build
+
+      # Upload the entire working directory (or your build dir) for Pages
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          # point this at your generated site folder; "." if everything’s already in /
+          path: .
+
+      # Deploy what you just uploaded
       - name: Deploy to GitHub Pages
         id: deploy
         uses: actions/deploy-pages@v2
         with:
-          token: ${{ secrets.PAT }}      # or GITHUB_TOKEN if your site is already enabled
-          artifact_name: github-pages     # <— this must match the “name:” above
+          # you can switch back to GITHUB_TOKEN here once the site exists
+          token: ${{ secrets.PAT }}
