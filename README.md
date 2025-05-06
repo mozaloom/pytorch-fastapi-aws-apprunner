@@ -51,10 +51,6 @@ python app.py
 └── utils/                    # Utility scripts
 ```
 
-## Screenshots
-
-![Swagger UI Interface](https://user-images.githubusercontent.com/58792/131587003-f5667c28-7cbe-402e-8795-f32a6ca9a4d1.png)
-
 ## References
 
 Based on the [PyTorch REST API tutorial](https://pytorch.org/tutorials/intermediate/flask_rest_api_tutorial.html)
