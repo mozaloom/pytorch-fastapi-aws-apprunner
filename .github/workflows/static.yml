@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read            # for reading your repo
-  pages: write              # for pages:deploy on subsequent runs
-  id-token: write           # required by configure-pages
+  contents: read
+  pages: write    # for deploy-pages
+  id-token: write # not strictly needed here but harmless
 
 concurrency:
   group: "pages"
@@ -19,18 +19,23 @@ jobs:
   deploy:
     environment:
       name: deploy
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deploy.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Pages (auto-enable)
-        uses: actions/configure-pages@v4
-        with:
-          # Use PAT here so we can create the Pages site if it doesn't exist
-          token: ${{ secrets.PAT }}
-          enablement: github
+      - name: Ensure GitHub Pages site exists
+        # Uses your PAT to POST /repos/:owner/:repo/pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+        run: |
+          curl -s -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            https://api.github.com/repos/${GITHUB_REPOSITORY}/pages \
+            -d '{"source":{"branch":"GPU","path":"/"}}' \
+          || echo "Site likely already exists"
 
       - name: Package site
         run: |
@@ -45,9 +50,7 @@ jobs:
           if-no-files-found: error
 
       - name: Deploy to GitHub Pages
-        id: deployment
+        id: deploy
         uses: actions/deploy-pages@v2
         with:
-          # Now that Pages is enabled, you can switch back to GITHUB_TOKEN if you like:
-          # token: ${{ secrets.GITHUB_TOKEN }}
           token: ${{ secrets.PAT }}
