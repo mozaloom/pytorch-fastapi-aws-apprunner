@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write   # this applies to GITHUB_TOKEN only
-  id-token: write
+  contents: read            # for reading your repo
+  pages: write              # for pages:deploy on subsequent runs
+  id-token: write           # required by configure-pages
 
 concurrency:
   group: "pages"
@@ -28,9 +28,9 @@ jobs:
       - name: Setup Pages (auto-enable)
         uses: actions/configure-pages@v4
         with:
+          # Use PAT here so we can create the Pages site if it doesn't exist
+          token: ${{ secrets.PAT }}
           enablement: github
-          # switch to your PAT so we can enable Pages on a Pages-disabled repo
-          github-token: ${{ secrets.PAT }}
 
       - name: Package site
         run: |
@@ -48,5 +48,6 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v2
         with:
-          # now that Pages is enabled, this can use GITHUB_TOKEN
-          github-token: ${{ secrets.PAT }}
+          # Now that Pages is enabled, you can switch back to GITHUB_TOKEN if you like:
+          # token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT }}
