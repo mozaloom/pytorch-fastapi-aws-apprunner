@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read     # read your code
-  pages: write       # publish to Pages
-  id-token: write    # required by configure-pages
+  contents: read     # for actions/checkout
+  pages: write       # for deploy-pages
+  id-token: write    # for configure-pages
 
 concurrency:
   group: "pages"
@@ -23,32 +23,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      # If this is a brand-new repo/site, ensure Pages is enabled:
+      # 1) Auto-enable Pages (first run only)
       - name: Setup Pages
         uses: actions/configure-pages@v4
         with:
-          # use PAT only on first run if Pages is disabled; after that you can revert to GITHUB_TOKEN
           token: ${{ secrets.PAT }}
           enablement: github
 
-      # (Optional) build step, if your site uses a static-site generator
-      # - name: Build
+      # 2) (Optional) build step, if you have a static-site generator
+      # - name: Build site
       #   run: npm ci && npm run build
 
-      # Upload the entire working directory (or your build dir) for Pages
+      # 3) Upload your site directory (here, the repo root) for Pages
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          # point this at your generated site folder; "." if everything’s already in /
-          path: .
+          path: .   # change to your built output folder, e.g. "./public"
 
-      # Deploy what you just uploaded
+      # 4) Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         id: deploy
         uses: actions/deploy-pages@v2
         with:
-          # you can switch back to GITHUB_TOKEN here once the site exists
           token: ${{ secrets.PAT }}
